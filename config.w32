@@ -1,0 +1,13 @@
+ARG_WITH("libdeflate", "Enable libdeflate support", "no");
+
+if (PHP_LIBDEFLATE != "no") {
+	if(CHECK_HEADER_ADD_INCLUDE("libdeflate.h", "CFLAGS_LIBDEFLATE", PHP_LIBDEFLATE + ";" + configure_module_dirname) &&    
+		(
+			CHECK_LIB("libdeflate.lib", "libdeflate", PHP_LIBDEFLATE) ||
+			CHECK_LIB("libdeflatestatic.lib", "libdeflate", PHP_LIBDEFLATE)
+		)) {
+		EXTENSION("libdeflate", "libdeflate.c", PHP_LIBDEFLATE_SHARED, "/DZEND_ENABLE_STATIC_TSRMLS_CACHE /I" + configure_module_dirname);
+	} else {
+		WARNING("libdeflate not enabled; libraries and headers not found");
+	}
+}
