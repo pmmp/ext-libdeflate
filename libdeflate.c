@@ -33,7 +33,7 @@ PHP_MINFO_FUNCTION(libdeflate)
 }
 /* }}} */
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_libdeflate_compress, 0, 2, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_libdeflate_compress, 0, 1, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, level, IS_LONG, 0)
 ZEND_END_ARG_INFO()
