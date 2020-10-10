@@ -53,6 +53,7 @@ PHP_FUNCTION(libdeflate_deflate_compress) {
 	struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(level);
 	if (compressor == NULL) {
 		zend_throw_exception_ex(spl_ce_RuntimeException, 0, "Unable to allocate libdeflate compressor");
+		return;
 	}
 
 	size_t compressBound = libdeflate_deflate_compress_bound(compressor, ZSTR_LEN(data));
@@ -61,6 +62,7 @@ PHP_FUNCTION(libdeflate_deflate_compress) {
 
 	if (actualSize == 0){
 		zend_throw_exception_ex(spl_ce_RuntimeException, 0, "Too small buffer provided (this is a bug)");
+		return;
 	}
 
 	RETVAL_STRINGL(output, actualSize);
