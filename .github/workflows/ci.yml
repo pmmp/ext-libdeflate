@@ -12,13 +12,13 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.3', '7.4', '8.0']
+        php: ['7.3', '7.4', '8.0', '8.1']
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.9.0
+        uses: shivammathur/setup-php@2.15.0
         with:
           php-version: "${{ matrix.php }}"
 
