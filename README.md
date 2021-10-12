@@ -1,5 +1,5 @@
 # ext-libdeflate
-[![Build Status](https://travis-ci.com/pmmp/ext-libdeflate.svg?branch=master)](https://travis-ci.com/pmmp/ext-libdeflate)
+[![CI](https://github.com/pmmp/ext-libdeflate/actions/workflows/ci.yml/badge.svg)](https://github.com/pmmp/ext-libdeflate/actions/workflows/ci.yml)
 
 PHP bindings for [libdeflate](https://github.com/ebiggers/libdeflate), a zlib replacement with significantly better performance.
 
