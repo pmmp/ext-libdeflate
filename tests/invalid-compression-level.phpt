@@ -1,7 +1,7 @@
 --TEST--
 Test that libdeflate_deflate_compress() doesn't segfault when given an invalid compression level
 --SKIPIF--
-<?php if(!extension_loaded("libdeflate)) die("skip: extension not loaded"); ?>
+<?php if(!extension_loaded("libdeflate")) die("skip: extension not loaded"); ?>
 --FILE--
 <?php
 
