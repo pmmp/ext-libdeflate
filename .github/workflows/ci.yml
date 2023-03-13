@@ -26,13 +26,14 @@ jobs:
         run: |
            git clone --depth=1 https://github.com/ebiggers/libdeflate.git -b v1.14
            cd libdeflate
-           PREFIX=. make install
+           cmake . -DCMAKE_PREFIX_PATH=. -DCMAKE_INSTALL_PREFIX=.
+           make install
            cd ..
 
       - name: Build extension
         run: |
           phpize
-          ./configure --with-libdeflate=libdeflate
+          PKG_CONFIG_PATH="${{ github.workspace }}/libdeflate/lib/pkgconfig ./configure --with-libdeflate
           make
 
       - name: Run .phpt tests
