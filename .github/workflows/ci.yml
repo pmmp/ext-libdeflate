@@ -33,7 +33,7 @@ jobs:
       - name: Build extension
         run: |
           phpize
-          PKG_CONFIG_PATH="${{ github.workspace }}/libdeflate/lib/pkgconfig ./configure --with-libdeflate
+          PKG_CONFIG_PATH="${{ github.workspace }}/libdeflate/lib/pkgconfig" ./configure --with-libdeflate
           make
 
       - name: Run .phpt tests
