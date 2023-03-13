@@ -24,7 +24,7 @@ jobs:
 
       - name: Build libdeflate
         run: |
-           git clone --depth=1 https://github.com/ebiggers/libdeflate.git -b v1.14
+           git clone --depth=1 https://github.com/ebiggers/libdeflate.git -b v1.17
            cd libdeflate
            cmake . -DCMAKE_PREFIX_PATH=. -DCMAKE_INSTALL_PREFIX=.
            make install
