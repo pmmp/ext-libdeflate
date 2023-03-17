@@ -10,6 +10,22 @@
 #include "php_libdeflate.h"
 #include "libdeflate.h"
 
+
+#define MAX_COMPRESSION_LEVEL 12
+#define COMPRESSOR_CACHE_SIZE MAX_COMPRESSION_LEVEL + 1 //extra slot for level 0
+
+ZEND_BEGIN_MODULE_GLOBALS(libdeflate)
+	struct libdeflate_compressor* compressor_cache[COMPRESSOR_CACHE_SIZE];
+ZEND_END_MODULE_GLOBALS(libdeflate);
+
+#define LIBDEFLATE_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(libdeflate, v)
+
+ZEND_DECLARE_MODULE_GLOBALS(libdeflate);
+
+PHP_MINIT_FUNCTION(libdeflate) {
+	libdeflate_set_memory_allocator(_emalloc, _efree);
+}
+
 /* {{{ PHP_RINIT_FUNCTION
  */
 PHP_RINIT_FUNCTION(libdeflate)
@@ -18,9 +34,20 @@ PHP_RINIT_FUNCTION(libdeflate)
 	ZEND_TSRMLS_CACHE_UPDATE();
 #endif
 
+	memset(LIBDEFLATE_G(compressor_cache), 0, sizeof(LIBDEFLATE_G(compressor_cache)));
 	return SUCCESS;
 }
 /* }}} */
+
+/* {{{ */
+PHP_RSHUTDOWN_FUNCTION(libdeflate) {
+	for (int i = 0; i < COMPRESSOR_CACHE_SIZE; i++) {
+		struct libdeflate_compressor* compressor = LIBDEFLATE_G(compressor_cache)[0];
+		if (compressor != NULL) {
+			libdeflate_free_compressor(compressor);
+		}
+	}
+} /* }}} */
 
 /* {{{ PHP_MINFO_FUNCTION
  */
@@ -42,10 +69,19 @@ typedef size_t (*php_libdeflate_compress_bound_func)(struct libdeflate_compresso
 typedef size_t (*php_libdeflate_compress_func)(struct libdeflate_compressor*, const void*, size_t, void*, size_t);
 
 static inline zend_string* php_libdeflate_compress(zend_string *data, zend_long level, php_libdeflate_compress_bound_func compressBoundFunc, php_libdeflate_compress_func compressFunc) {
-	struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(level);
-	if (compressor == NULL) {
-		zend_throw_exception_ex(spl_ce_RuntimeException, 0, "Unable to allocate libdeflate compressor");
+	if (level < 0 || level > MAX_COMPRESSION_LEVEL) {
+		zend_value_error("Invalid compression level: %zi (accepted levels: %u...%u)", level, 0, MAX_COMPRESSION_LEVEL);
 		return NULL;
+	}
+
+	struct libdeflate_compressor* compressor = LIBDEFLATE_G(compressor_cache)[level];
+	if (compressor == NULL) {
+		compressor = libdeflate_alloc_compressor(level);
+		if (compressor == NULL) {
+			zend_throw_exception_ex(spl_ce_RuntimeException, 0, "Unable to allocate libdeflate compressor (this is a bug)");
+			return NULL;
+		}
+		LIBDEFLATE_G(compressor_cache)[level] = compressor;
 	}
 
 	size_t compressBound = compressBoundFunc(compressor, ZSTR_LEN(data));
@@ -59,7 +95,6 @@ static inline zend_string* php_libdeflate_compress(zend_string *data, zend_long 
 
 	zend_string* result = zend_string_init(output, actualSize, 0);
 	efree(output);
-	libdeflate_free_compressor(compressor);
 	return result;
 }
 
@@ -106,13 +141,15 @@ zend_module_entry libdeflate_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"libdeflate",
 	libdeflate_functions,
-	NULL, /* PHP_MINIT */
+	PHP_MINIT(libdeflate),
 	NULL, /* PHP_MSHUTDOWN */
-	PHP_RINIT(libdeflate), /* PHP_RINIT */
-	NULL, /* PHP_RSHUTDOWN */
+	PHP_RINIT(libdeflate),
+	PHP_RSHUTDOWN(libdeflate),
 	PHP_MINFO(libdeflate),
 	PHP_LIBDEFLATE_VERSION,
-	STANDARD_MODULE_PROPERTIES
+	PHP_MODULE_GLOBALS(libdeflate),
+	NULL,
+	STANDARD_MODULE_PROPERTIES_EX
 };
 /* }}} */
 
