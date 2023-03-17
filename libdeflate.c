@@ -22,10 +22,6 @@ ZEND_END_MODULE_GLOBALS(libdeflate);
 
 ZEND_DECLARE_MODULE_GLOBALS(libdeflate);
 
-PHP_MINIT_FUNCTION(libdeflate) {
-	libdeflate_set_memory_allocator(_emalloc, _efree);
-}
-
 /* {{{ PHP_RINIT_FUNCTION
  */
 PHP_RINIT_FUNCTION(libdeflate)
@@ -141,7 +137,7 @@ zend_module_entry libdeflate_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"libdeflate",
 	libdeflate_functions,
-	PHP_MINIT(libdeflate),
+	NULL,
 	NULL, /* PHP_MSHUTDOWN */
 	PHP_RINIT(libdeflate),
 	PHP_RSHUTDOWN(libdeflate),
