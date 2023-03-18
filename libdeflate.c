@@ -12,7 +12,7 @@
 
 
 #define MAX_COMPRESSION_LEVEL 12
-#define COMPRESSOR_CACHE_SIZE MAX_COMPRESSION_LEVEL + 1 //extra slot for level 0
+#define COMPRESSOR_CACHE_SIZE (MAX_COMPRESSION_LEVEL + 1) //extra slot for level 0
 
 ZEND_BEGIN_MODULE_GLOBALS(libdeflate)
 	struct libdeflate_compressor* compressor_cache[COMPRESSOR_CACHE_SIZE];
@@ -30,7 +30,7 @@ PHP_RINIT_FUNCTION(libdeflate)
 	ZEND_TSRMLS_CACHE_UPDATE();
 #endif
 
-	memset(LIBDEFLATE_G(compressor_cache), 0, sizeof(LIBDEFLATE_G(compressor_cache)));
+	memset(LIBDEFLATE_G(compressor_cache), 0, sizeof(struct libdeflate_compressor*) * COMPRESSOR_CACHE_SIZE);
 	return SUCCESS;
 }
 /* }}} */
@@ -38,11 +38,13 @@ PHP_RINIT_FUNCTION(libdeflate)
 /* {{{ */
 PHP_RSHUTDOWN_FUNCTION(libdeflate) {
 	for (int i = 0; i < COMPRESSOR_CACHE_SIZE; i++) {
-		struct libdeflate_compressor* compressor = LIBDEFLATE_G(compressor_cache)[0];
+		struct libdeflate_compressor* compressor = LIBDEFLATE_G(compressor_cache)[i];
 		if (compressor != NULL) {
 			libdeflate_free_compressor(compressor);
 		}
 	}
+
+	return SUCCESS;
 } /* }}} */
 
 /* {{{ PHP_MINFO_FUNCTION
@@ -144,6 +146,8 @@ zend_module_entry libdeflate_module_entry = {
 	PHP_MINFO(libdeflate),
 	PHP_LIBDEFLATE_VERSION,
 	PHP_MODULE_GLOBALS(libdeflate),
+	NULL,
+	NULL,
 	NULL,
 	STANDARD_MODULE_PROPERTIES_EX
 };
