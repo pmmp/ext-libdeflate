@@ -6,7 +6,7 @@
 extern zend_module_entry libdeflate_module_entry;
 # define phpext_libdeflate_ptr &libdeflate_module_entry
 
-# define PHP_LIBDEFLATE_VERSION "0.2.1-dev"
+# define PHP_LIBDEFLATE_VERSION "0.2.1"
 
 # if defined(ZTS) && defined(COMPILE_DL_LIBDEFLATE)
 ZEND_TSRMLS_CACHE_EXTERN()
