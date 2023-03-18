@@ -7,13 +7,13 @@ Test that libdeflate_deflate_compress() doesn't segfault when given an invalid c
 
 try{
 	libdeflate_deflate_compress("aaaaaa", -1);
-}catch(\RuntimeException $e){
+}catch(\InvalidArgumentException $e){
 	var_dump("ok");
 }
 
 try{
 	libdeflate_deflate_compress("aaaaaa", 13);
-}catch(\RuntimeException $e){
+}catch(\InvalidArgumentException $e){
 	var_dump("ok");
 }
 ?>
