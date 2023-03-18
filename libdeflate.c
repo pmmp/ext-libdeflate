@@ -68,7 +68,14 @@ typedef size_t (*php_libdeflate_compress_func)(struct libdeflate_compressor*, co
 
 static inline zend_string* php_libdeflate_compress(zend_string *data, zend_long level, php_libdeflate_compress_bound_func compressBoundFunc, php_libdeflate_compress_func compressFunc) {
 	if (level < 0 || level > MAX_COMPRESSION_LEVEL) {
-		zend_value_error("Invalid compression level: %zi (accepted levels: %u...%u)", level, 0, MAX_COMPRESSION_LEVEL);
+		zend_throw_exception_ex(
+			spl_ce_InvalidArgumentException,
+			0,
+			"Invalid compression level: %zi (accepted levels: %u...%u)",
+			level,
+			0,
+			MAX_COMPRESSION_LEVEL
+		);
 		return NULL;
 	}
 
