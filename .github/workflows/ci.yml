@@ -12,19 +12,19 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.3', '7.4', '8.0', '8.1', '8.2']
+        php: ['7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.24.0
+        uses: shivammathur/setup-php@2.27.1
         with:
           php-version: "${{ matrix.php }}"
 
       - name: Build libdeflate
         run: |
-           git clone --depth=1 https://github.com/ebiggers/libdeflate.git -b v1.17
+           git clone --depth=1 https://github.com/ebiggers/libdeflate.git -b v1.19
            cd libdeflate
            cmake . -DCMAKE_PREFIX_PATH=. -DCMAKE_INSTALL_PREFIX=.
            make install
