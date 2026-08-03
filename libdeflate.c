@@ -103,12 +103,19 @@ static inline zend_string* php_libdeflate_compress(zend_string *data, zend_long 
 	return result;
 }
 
+// php7 warns rather that throws with ZEND_PARSE_PARAMETERS_START
+#if PHP_VERSION_ID >= 80000
+#define LIBDEEFLATE_PARSE_PARAMS() ZEND_PARSE_PARAMETERS_START(1, 2)
+#else
+#define LIBDEEFLATE_PARSE_PARAMS() ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
+#endif
+
 #define PHP_LIBDEFLATE_FUNC(compressFunc, compressBoundFunc) \
 PHP_FUNCTION(compressFunc) { \
 	zend_string *data; \
 	zend_long level = 6; \
 \
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2) \
+	LIBDEEFLATE_PARSE_PARAMS() \
 		Z_PARAM_STR(data) \
 		Z_PARAM_OPTIONAL \
 		Z_PARAM_LONG(level) \
